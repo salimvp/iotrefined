@@ -1,21 +1,16 @@
 "use client";
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { isSupabaseConfigured, SUPABASE_ANON_KEY, SUPABASE_URL } from "./config";
 
 /**
- * Public Supabase credentials.
+ * Browser Supabase client.
  *
- * Only the publishable (anon) key belongs in the browser. Access is constrained
- * by Row Level Security. The service-role key must NEVER reach this file.
+ * Credential resolution lives in `./config` so the server-side MCP route and
+ * this client can never disagree about whether the app is configured.
  */
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-const anonKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? "";
 
-const hasPlaceholder = (v: string) =>
-  v.length === 0 || v.includes("YOUR-PROJECT-REF") || v.includes("YOUR-PUBLIC");
-
-/** True only when real credentials are present, so the app can fall back to demo mode. */
-export const isSupabaseConfigured = /^https?:\/\//.test(url) && !hasPlaceholder(url) && !hasPlaceholder(anonKey);
+export { isSupabaseConfigured };
 
 let client: SupabaseClient | null = null;
 
@@ -23,7 +18,7 @@ let client: SupabaseClient | null = null;
 export function getSupabase(): SupabaseClient | null {
   if (!isSupabaseConfigured) return null;
   if (!client) {
-    client = createClient(url, anonKey, {
+    client = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       realtime: { params: { eventsPerSecond: 10 } },
       auth: { persistSession: false },
     });

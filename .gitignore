@@ -9,6 +9,8 @@ build/
 .env.local
 .env*.local
 .env*.bak
+# plaintext env export used to import variables into Vercel
+vercel-env.txt
 *.log
 .DS_Store
 next-env.d.ts
